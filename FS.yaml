@@ -1,0 +1,17 @@
+---
+- name: Check for filesystems with usage above 50%
+  hosts: all
+  gather_facts: yes
+  tasks:
+    - name: Get disk usage
+      ansible.builtin.command: df -h
+      register: disk_usage
+
+    - name: Parse disk usage and find filesystems over 50% usage
+      set_fact:
+        over_50_usage: "{{ disk_usage.stdout_lines[1:] | selectattr('split', 'call', lambda x: x[4] | int > 50) | list }}"
+
+    - name: Display filesystems over 50% usage
+      debug:
+        var: over_50_usage
+      when: over_50_usage | length > 0
