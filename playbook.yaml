@@ -1,0 +1,18 @@
+---
+- name: Check CPU Usage on Red Hat Servers
+  hosts: localhost
+  become: yes
+  tasks:
+    - name: Install sysstat package
+      yum:
+        name: sysstat
+        state: present
+
+    - name: Collect CPU usage statistics
+      command: mpstat 1 1
+      register: cpu_metrics
+      changed_when: false
+
+    - name: Display CPU usage information
+      debug:
+        var: cpu_metrics.stdout_lines
